@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { useAttrs } from 'vue';
 
-// defineProps<{
-// 	customClass?: string;
-// }>();
-
 // Obtenemos los atributos que no se declaran como props
 const attrs = useAttrs();
 </script>
