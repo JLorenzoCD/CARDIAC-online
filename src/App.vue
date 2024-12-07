@@ -5,11 +5,11 @@ import MyButton from './components/Button.vue';
 import Cell from './components/Cell.vue';
 
 const pc = ref(0);
-const acc = ref(0);
-const instrStrip = ref(new Array(4).fill(0));
-const inputStrip = ref(new Array(25).fill(''));
-const outputStrip = ref(new Array(25).fill(''));
-const mem = ref(new Array(100).fill(''));
+const acc = ref('0000');
+const instrStrip = ref<number[]>(new Array(4).fill(0));
+const inputStrip = ref<{ strip: string[]; curr: number }>({ strip: new Array(25).fill(''), curr: 0 });
+const outputStrip = ref<{ strip: string[]; curr: number }>({ strip: new Array(25).fill(''), curr: 0 });
+const mem = ref<string[]>(new Array(100).fill(''));
 
 init_cardiac();
 
@@ -23,6 +23,7 @@ const instructions = [
 	['Copia el acumulador al casillero'],
 	['Resta el contenido del casillero', 'con el acumulador'],
 	['Mové el puntero al casillero', 'y suma la locación original al casillero 99'],
+	['Se finaliza el programa'],
 ];
 
 const accOperation = computed(() => {
@@ -34,18 +35,22 @@ const regInstruction = computed(() => {
 });
 
 const decodeInstruction = computed(() => {
-	let decode = '';
 	const instr = instrStrip.value[1];
 
-	if (instr == 9) return decode;
+	// Fin del programa
+	if (instr == 9) return instructions[instr][0];
 
+	let decode = '';
 	if (instructions[instr].length < 3) {
+		// Decodificación 'frase + nn'
 		decode = `${instructions[instr][0]} '${instrStrip.value[2]}${instrStrip.value[3]}'`;
 	} else if (instructions[instr].length == 3) {
+		// Decodificación 'frase + n + frase + n + frase'
 		decode = `${instructions[instr][0]} '${instrStrip.value[2]}' ${instructions[instr][1]} '${instrStrip.value[3]}' ${instructions[instr][2]}`;
 	}
 
 	if (instructions[instr].length == 2) {
+		// Decodificación 'frase + nn + frase' (se modifica el primer if para añadir la ultima frase)
 		decode += ' ' + instructions[instr][1];
 	}
 
@@ -53,32 +58,114 @@ const decodeInstruction = computed(() => {
 });
 
 function execute() {
-	const instr = instrStrip.value[1];
+	// Se obtiene la instrucción a ejecutar
+	const instruction = mem.value[pc.value];
 
-	if (instr == 9) return;
+	if (
+		!instruction ||
+		instruction.length != 3 ||
+		isNaN(Number(instruction)) ||
+		instruction.includes('.') ||
+		instruction.includes(',')
+	)
+		return;
 
-	// TODO
+	const instr = parseInt(instruction[0]);
+
+	if (instr == 9) {
+		instrStrip.value[1] = instr;
+		instrStrip.value[2] = 0;
+		instrStrip.value[3] = 0;
+		return;
+	}
+
+	const inst2 = parseInt(instruction[1]);
+	const inst3 = parseInt(instruction[2]);
+
+	instrStrip.value[0] = instr == 7 ? 1 : 0;
+	instrStrip.value[1] = instr;
+	instrStrip.value[2] = inst2;
+	instrStrip.value[3] = inst3;
+
+	pc.value++;
+
+	let a, b, temp;
+	switch (instr) {
+		case 0:
+			mem.value[inst2 * 10 + inst3] = inputStrip.value.strip[inputStrip.value.curr];
+			inputStrip.value.curr++;
+			break;
+		case 1:
+			acc.value = mem.value[inst2 * 10 + inst3].padStart(4, '0');
+			break;
+		case 2:
+			a = parseInt(mem.value[inst2 * 10 + inst3]);
+			b = parseInt(acc.value);
+
+			temp = a + b;
+			acc.value = temp.toString().padStart(4, '0');
+			break;
+		case 3:
+			pc.value = inst2 * 10 + inst3;
+			break;
+		case 4:
+			temp = parseInt(acc.value);
+			temp = temp * 10 ** inst2;
+			temp = Math.trunc(temp / 10 ** inst3);
+			temp = temp % 10000;
+
+			acc.value = temp.toString().padStart(4, '0');
+			break;
+		case 5:
+			outputStrip.value.strip[outputStrip.value.curr] = mem.value[inst2 * 10 + inst3];
+			outputStrip.value.curr++;
+			break;
+		case 6:
+			mem.value[inst2 * 10 + inst3] = acc.value.substring(1, 4);
+			break;
+		case 7:
+			a = parseInt(mem.value[inst2 * 10 + inst3]);
+			b = parseInt(acc.value);
+
+			temp = b - a;
+			acc.value = temp.toString().padStart(4, '0');
+			break;
+		case 8:
+			temp = mem.value[99];
+			temp = temp == '' ? '0' : temp;
+
+			mem.value[99] = (parseInt(temp) + pc.value).toString().padStart(3, '0');
+
+			pc.value = inst2 * 10 + inst3;
+			break;
+
+		default:
+			throw new Error('Instrucción no valida');
+	}
 }
 
 function init_cardiac() {
-	acc.value = 0;
+	acc.value = '0000';
 	pc.value = 0;
 
 	instrStrip.value.fill(0);
 
 	mem.value.fill('');
 	mem.value[0] = '001';
+	mem.value[99] = '800';
 
-	inputStrip.value.fill('');
-	outputStrip.value.fill('');
+	inputStrip.value.strip.fill('');
+	inputStrip.value.curr = 0;
+	outputStrip.value.strip.fill('');
+	outputStrip.value.curr = 0;
 
 	init_example_sum();
 }
 
 function init_example_sum() {
-	inputStrip.value[0] = '802';
-	inputStrip.value[1] = '040';
-	inputStrip.value[2] = '023';
+	inputStrip.value.strip[0] = '802';
+	inputStrip.value.strip[1] = '040';
+	inputStrip.value.strip[2] = '023';
 
 	mem.value[2] = '090';
 	mem.value[3] = '091';
@@ -95,11 +182,11 @@ function init_example_sum() {
 		<h1 class="text-3xl font-bold underline mb-8">CARDIAC Online</h1>
 
 		<div class="my-5">
-			<p>Registro de instrucción: "{{ regInstruction }}"</p>
-
+			<p>PC: {{ pc }}</p>
+			<p>Acumulador: "{{ acc }}"</p>
+			<p>Registro de la anterior instrucción: "{{ regInstruction }}"</p>
 			<p>La operación con el acumulador es: "{{ accOperation }}"</p>
-
-			<p>Decodificador de instrucción: "{{ decodeInstruction }}"</p>
+			<p>Decodificador de la anterior instrucción: "{{ decodeInstruction }}"</p>
 
 			<MyButton class="mr-5" @click="execute">Ejecutar</MyButton>
 			<MyButton @click="init_cardiac">Resetear</MyButton>
@@ -124,27 +211,35 @@ function init_example_sum() {
 			</label>
 		</div>
 
-		<p class="mb-2" v-if="instrStrip[1] == 9">Se termino</p>
-
 		<div class="flex gap-8">
 			<article>
 				Tarjeta de Entrada
 				<ul class="flex flex-col">
-					<Cell v-for="(e, index) in inputStrip" :content="e" :index="index + 1" />
+					<Cell
+						v-for="(e, index) in inputStrip.strip"
+						:content="e"
+						:index="index + 1"
+						:is-curr="inputStrip.curr == index"
+					/>
 				</ul>
 			</article>
 
 			<article>
 				Tarjeta de Salida
 				<ul class="flex flex-col">
-					<Cell v-for="(s, index) in outputStrip" :content="s" :index="index + 1" />
+					<Cell
+						v-for="(s, index) in outputStrip.strip"
+						:content="s"
+						:index="index + 1"
+						:is-curr="outputStrip.curr == index"
+					/>
 				</ul>
 			</article>
 
 			<article>
 				Celdas de Memoria
 				<ul class="flex flex-col flex-wrap h-[408px]">
-					<Cell v-for="(m, index) in mem" :content="m" :index="index" />
+					<Cell v-for="(m, index) in mem" :content="m" :index="index" :is-curr="pc == index" />
 				</ul>
 			</article>
 		</div>
