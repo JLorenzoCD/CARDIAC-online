@@ -5,11 +5,11 @@ import MyButton from './components/Button.vue';
 import Cell from './components/Cell.vue';
 
 const pc = ref(0);
-const acc = ref('0000');
+const acc = ref(0);
 const instrStrip = ref<number[]>(new Array(4).fill(0));
-const inputStrip = ref<{ strip: string[]; curr: number }>({ strip: new Array(25).fill(''), curr: 0 });
-const outputStrip = ref<{ strip: string[]; curr: number }>({ strip: new Array(25).fill(''), curr: 0 });
-const mem = ref<string[]>(new Array(100).fill(''));
+const inputStrip = ref<{ strip: number[]; curr: number }>({ strip: new Array(25).fill(0), curr: 0 });
+const outputStrip = ref<{ strip: number[]; curr: number }>({ strip: new Array(25).fill(0), curr: 0 });
+const mem = ref<number[]>(new Array(100).fill(0));
 
 init_cardiac();
 
@@ -59,16 +59,9 @@ const decodeInstruction = computed(() => {
 
 function execute() {
 	// Se obtiene la instrucción a ejecutar
-	const instruction = mem.value[pc.value];
+	const instruction = mem.value[pc.value].toString().padStart(3, '0');
 
-	if (
-		!instruction ||
-		instruction.length != 3 ||
-		isNaN(Number(instruction)) ||
-		instruction.includes('.') ||
-		instruction.includes(',')
-	)
-		return;
+	if (instruction.length != 3) return;
 
 	const instr = parseInt(instruction[0]);
 
@@ -96,45 +89,49 @@ function execute() {
 			inputStrip.value.curr++;
 			break;
 		case 1:
-			acc.value = mem.value[inst2 * 10 + inst3].padStart(4, '0');
+			acc.value = mem.value[inst2 * 10 + inst3];
 			break;
 		case 2:
-			a = parseInt(mem.value[inst2 * 10 + inst3]);
-			b = parseInt(acc.value);
+			a = mem.value[inst2 * 10 + inst3];
+			b = acc.value;
 
 			temp = a + b;
-			acc.value = temp.toString().padStart(4, '0');
+
+			acc.value = temp % 10000;
 			break;
 		case 3:
 			pc.value = inst2 * 10 + inst3;
 			break;
 		case 4:
-			temp = parseInt(acc.value);
+			temp = acc.value;
 			temp = temp * 10 ** inst2;
-			temp = Math.trunc(temp / 10 ** inst3);
 			temp = temp % 10000;
+			temp = Math.trunc(temp / 10 ** inst3);
 
-			acc.value = temp.toString().padStart(4, '0');
+			acc.value = temp;
 			break;
 		case 5:
 			outputStrip.value.strip[outputStrip.value.curr] = mem.value[inst2 * 10 + inst3];
 			outputStrip.value.curr++;
 			break;
 		case 6:
-			mem.value[inst2 * 10 + inst3] = acc.value.substring(1, 4);
+			temp = acc.value % 1000;
+			mem.value[inst2 * 10 + inst3] = temp;
 			break;
 		case 7:
-			a = parseInt(mem.value[inst2 * 10 + inst3]);
-			b = parseInt(acc.value);
+			a = mem.value[inst2 * 10 + inst3];
+			b = acc.value;
 
 			temp = b - a;
-			acc.value = temp.toString().padStart(4, '0');
+
+			if (temp < 0) {
+				throw new Error('No es posible tener un acumulador negativo');
+			}
+
+			acc.value = temp;
 			break;
 		case 8:
-			temp = mem.value[99];
-			temp = temp == '' ? '0' : temp;
-
-			mem.value[99] = (parseInt(temp) + pc.value).toString().padStart(3, '0');
+			mem.value[99] = mem.value[99] + pc.value;
 
 			pc.value = inst2 * 10 + inst3;
 			break;
@@ -145,35 +142,35 @@ function execute() {
 }
 
 function init_cardiac() {
-	acc.value = '0000';
+	acc.value = 0;
 	pc.value = 0;
 
 	instrStrip.value.fill(0);
 
-	mem.value.fill('');
-	mem.value[0] = '001';
-	mem.value[99] = '800';
+	mem.value.fill(0);
+	mem.value[0] = 1;
+	mem.value[99] = 800;
 
-	inputStrip.value.strip.fill('');
+	inputStrip.value.strip.fill(0);
 	inputStrip.value.curr = 0;
-	outputStrip.value.strip.fill('');
+	outputStrip.value.strip.fill(0);
 	outputStrip.value.curr = 0;
 
 	init_example_sum();
 }
 
 function init_example_sum() {
-	inputStrip.value.strip[0] = '802';
-	inputStrip.value.strip[1] = '040';
-	inputStrip.value.strip[2] = '023';
+	inputStrip.value.strip[0] = 802;
+	inputStrip.value.strip[1] = 40;
+	inputStrip.value.strip[2] = 23;
 
-	mem.value[2] = '090';
-	mem.value[3] = '091';
-	mem.value[4] = '190';
-	mem.value[5] = '291';
-	mem.value[6] = '692';
-	mem.value[7] = '592';
-	mem.value[8] = '900';
+	mem.value[2] = 90;
+	mem.value[3] = 91;
+	mem.value[4] = 190;
+	mem.value[5] = 291;
+	mem.value[6] = 692;
+	mem.value[7] = 592;
+	mem.value[8] = 900;
 }
 </script>
 
@@ -183,7 +180,7 @@ function init_example_sum() {
 
 		<div class="my-5">
 			<p>PC: {{ pc }}</p>
-			<p>Acumulador: "{{ acc }}"</p>
+			<p>Acumulador: "{{ acc.toString().padStart(4, '0') }}"</p>
 			<p>Registro de la anterior instrucción: "{{ regInstruction }}"</p>
 			<p>La operación con el acumulador es: "{{ accOperation }}"</p>
 			<p>Decodificador de la anterior instrucción: "{{ decodeInstruction }}"</p>
@@ -217,7 +214,7 @@ function init_example_sum() {
 				<ul class="flex flex-col">
 					<Cell
 						v-for="(e, index) in inputStrip.strip"
-						:content="e"
+						:content="e.toString().padStart(3, '0')"
 						:index="index + 1"
 						:is-curr="inputStrip.curr == index"
 					/>
@@ -229,7 +226,7 @@ function init_example_sum() {
 				<ul class="flex flex-col">
 					<Cell
 						v-for="(s, index) in outputStrip.strip"
-						:content="s"
+						:content="s.toString().padStart(3, '0')"
 						:index="index + 1"
 						:is-curr="outputStrip.curr == index"
 					/>
@@ -239,7 +236,12 @@ function init_example_sum() {
 			<article>
 				Celdas de Memoria
 				<ul class="flex flex-col flex-wrap h-[408px]">
-					<Cell v-for="(m, index) in mem" :content="m" :index="index" :is-curr="pc == index" />
+					<Cell
+						v-for="(m, index) in mem"
+						:content="m.toString().padStart(3, '0')"
+						:index="index"
+						:is-curr="pc == index"
+					/>
 				</ul>
 			</article>
 		</div>
