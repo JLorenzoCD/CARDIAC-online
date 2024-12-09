@@ -153,8 +153,6 @@ function init_cardiac() {
 	inputStrip.value.curr = 0;
 	outputStrip.value.strip.fill(0);
 	outputStrip.value.curr = 0;
-
-	init_example_sum();
 }
 
 function init_example_sum() {
@@ -172,11 +170,52 @@ function init_example_sum() {
 	mem.value[7] = 592;
 	mem.value[8] = 900;
 }
+
+function init_example_count() {
+	init_cardiac();
+
+	inputStrip.value.strip[0] = 2;
+	inputStrip.value.strip[1] = 800;
+	inputStrip.value.strip[2] = 10;
+	inputStrip.value.strip[3] = 100;
+	inputStrip.value.strip[4] = 11;
+	inputStrip.value.strip[5] = 605;
+	inputStrip.value.strip[6] = 12;
+	inputStrip.value.strip[7] = 104;
+	inputStrip.value.strip[8] = 13;
+	inputStrip.value.strip[9] = 322;
+	inputStrip.value.strip[10] = 14;
+	inputStrip.value.strip[11] = 505;
+	inputStrip.value.strip[12] = 15;
+	inputStrip.value.strip[13] = 105;
+	inputStrip.value.strip[14] = 16;
+	inputStrip.value.strip[15] = 200;
+	inputStrip.value.strip[16] = 17;
+	inputStrip.value.strip[17] = 605;
+	inputStrip.value.strip[18] = 18;
+	inputStrip.value.strip[19] = 104;
+	inputStrip.value.strip[20] = 19;
+	inputStrip.value.strip[21] = 700;
+	inputStrip.value.strip[22] = 20;
+	inputStrip.value.strip[23] = 604;
+	inputStrip.value.strip[24] = 21;
+	inputStrip.value.strip[25] = 812;
+	inputStrip.value.strip[26] = 22;
+	inputStrip.value.strip[27] = 900;
+	inputStrip.value.strip[28] = 4;
+	inputStrip.value.strip[29] = 9;
+	inputStrip.value.strip[30] = 2;
+	inputStrip.value.strip[31] = 810;
+}
 </script>
 
 <template>
 	<div class="container mx-auto pt-3">
 		<h1 class="text-3xl font-bold underline mb-8">CARDIAC Online</h1>
+
+		<MyButton class="mr-5" @click="init_cardiac">Resetear</MyButton>
+		<MyButton class="mr-5" @click="init_example_sum">Ejemplo Suma</MyButton>
+		<MyButton @click="init_example_count">Ejemplo Contador</MyButton>
 
 		<div class="my-5">
 			<p>PC: {{ pc }}</p>
