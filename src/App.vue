@@ -103,7 +103,7 @@ function execute() {
 			break;
 		case 3:
 			if (acc.value < 0) {
-			pc.value = inst2 * 10 + inst3;
+				pc.value = inst2 * 10 + inst3;
 			}
 			break;
 		case 4:
@@ -137,6 +137,22 @@ function execute() {
 		default:
 			throw new Error('Instrucción no valida');
 	}
+}
+
+function execute_slow() {
+	const intervalo = setInterval(() => {
+		let res;
+
+		try {
+			res = execute();
+		} catch (err) {
+			res = 900;
+		}
+
+		if (res === 900) {
+			clearInterval(intervalo);
+		}
+	}, 100);
 }
 
 function init_cardiac() {
@@ -225,7 +241,7 @@ function init_example_count() {
 			<p>Decodificador de la anterior instrucción: "{{ decodeInstruction }}"</p>
 
 			<MyButton class="mr-5" @click="execute">Ejecutar</MyButton>
-			<MyButton @click="init_cardiac">Resetear</MyButton>
+			<MyButton @click="execute_slow">Ejecutar paso a paso</MyButton>
 		</div>
 
 		<div class="flex gap-8">
