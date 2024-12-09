@@ -61,7 +61,7 @@ function execute() {
 	// Se obtiene la instrucción a ejecutar
 	const instruction = mem.value[pc.value].toString().padStart(3, '0');
 
-	if (instruction.length != 3) return;
+	if (instruction.length != 3 || instruction == '000') throw new Error('Instrucción invalida');
 
 	const instr = parseInt(instruction[0]);
 
@@ -69,7 +69,7 @@ function execute() {
 		instrStrip.value[1] = instr;
 		instrStrip.value[2] = 0;
 		instrStrip.value[3] = 0;
-		return;
+		return 900;
 	}
 
 	const inst2 = parseInt(instruction[1]);
@@ -100,7 +100,9 @@ function execute() {
 			acc.value = temp % 10000;
 			break;
 		case 3:
+			if (acc.value < 0) {
 			pc.value = inst2 * 10 + inst3;
+			}
 			break;
 		case 4:
 			temp = acc.value;
@@ -122,16 +124,10 @@ function execute() {
 			a = mem.value[inst2 * 10 + inst3];
 			b = acc.value;
 
-			temp = b - a;
-
-			if (temp < 0) {
-				throw new Error('No es posible tener un acumulador negativo');
-			}
-
-			acc.value = temp;
+			acc.value = b - a;
 			break;
 		case 8:
-			mem.value[99] = mem.value[99] + pc.value;
+			mem.value[99] = 800 + pc.value;
 
 			pc.value = inst2 * 10 + inst3;
 			break;
@@ -160,6 +156,8 @@ function init_cardiac() {
 }
 
 function init_example_sum() {
+	init_cardiac();
+
 	inputStrip.value.strip[0] = 802;
 	inputStrip.value.strip[1] = 40;
 	inputStrip.value.strip[2] = 23;
