@@ -4,6 +4,8 @@ import { computed, ref } from 'vue';
 import MyButton from './components/Button.vue';
 import Cell from './components/Cell.vue';
 
+import { formatContentLen } from './utils/format';
+
 const pc = ref(0);
 const acc = ref(0);
 const instrStrip = ref<number[]>(new Array(4).fill(0));
@@ -178,7 +180,7 @@ function init_example_sum() {
 
 		<div class="my-5">
 			<p>PC: {{ pc }}</p>
-			<p>Acumulador: "{{ acc.toString().padStart(4, '0') }}"</p>
+			<p>Acumulador: "{{ formatContentLen(acc, 4) }}"</p>
 			<p>Registro de la anterior instrucción: "{{ regInstruction }}"</p>
 			<p>La operación con el acumulador es: "{{ accOperation }}"</p>
 			<p>Decodificador de la anterior instrucción: "{{ decodeInstruction }}"</p>
@@ -212,7 +214,7 @@ function init_example_sum() {
 				<ul class="flex flex-col">
 					<Cell
 						v-for="(e, index) in inputStrip.strip"
-						:content="e.toString().padStart(3, '0')"
+						:content="formatContentLen(e)"
 						:index="index + 1"
 						:is-curr="inputStrip.curr == index"
 					/>
@@ -224,7 +226,7 @@ function init_example_sum() {
 				<ul class="flex flex-col">
 					<Cell
 						v-for="(s, index) in outputStrip.strip"
-						:content="s.toString().padStart(3, '0')"
+						:content="formatContentLen(s)"
 						:index="index + 1"
 						:is-curr="outputStrip.curr == index"
 					/>
@@ -234,12 +236,7 @@ function init_example_sum() {
 			<article>
 				Celdas de Memoria
 				<ul class="flex flex-col flex-wrap h-[408px]">
-					<Cell
-						v-for="(m, index) in mem"
-						:content="m.toString().padStart(3, '0')"
-						:index="index"
-						:is-curr="pc == index"
-					/>
+					<Cell v-for="(m, index) in mem" :content="formatContentLen(m)" :index="index" :is-curr="pc == index" />
 				</ul>
 			</article>
 		</div>
