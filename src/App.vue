@@ -2,8 +2,8 @@
 import useCARDIAC from './composables/useCARDIAC';
 
 import MyButton from './components/Button.vue';
-import Cell from './components/Cell.vue';
 import DataStrip from './components/DataStrip.vue';
+import Memory from './components/Memory.vue';
 
 import { formatContentLen } from './utils/format';
 
@@ -133,12 +133,7 @@ function init_example_count() {
 			<DataStrip title="Tarjeta de Entrada" :data="inputStrip" />
 			<DataStrip title="Tarjeta de Salida" :data="outputStrip" />
 
-			<article>
-				Celdas de Memoria
-				<ul class="flex flex-col flex-wrap h-[408px]">
-					<Cell v-for="(m, index) in mem" :content="formatContentLen(m)" :index="index" :is-curr="pc == index" />
-				</ul>
-			</article>
+			<Memory :pc="pc" :data="mem" />
 		</div>
 	</div>
 </template>
