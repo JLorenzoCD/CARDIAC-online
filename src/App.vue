@@ -3,6 +3,7 @@ import useCARDIAC from './composables/useCARDIAC';
 
 import MyButton from './components/Button.vue';
 import Cell from './components/Cell.vue';
+import DataStrip from './components/DataStrip.vue';
 
 import { formatContentLen } from './utils/format';
 
@@ -129,29 +130,8 @@ function init_example_count() {
 		</div>
 
 		<div class="flex gap-8">
-			<article>
-				Tarjeta de Entrada
-				<ul class="flex flex-col">
-					<Cell
-						v-for="(e, index) in inputStrip.strip"
-						:content="formatContentLen(e)"
-						:index="index + 1"
-						:is-curr="inputStrip.curr == index"
-					/>
-				</ul>
-			</article>
-
-			<article>
-				Tarjeta de Salida
-				<ul class="flex flex-col">
-					<Cell
-						v-for="(s, index) in outputStrip.strip"
-						:content="formatContentLen(s)"
-						:index="index + 1"
-						:is-curr="outputStrip.curr == index"
-					/>
-				</ul>
-			</article>
+			<DataStrip title="Tarjeta de Entrada" :data="inputStrip" />
+			<DataStrip title="Tarjeta de Salida" :data="outputStrip" />
 
 			<article>
 				Celdas de Memoria
