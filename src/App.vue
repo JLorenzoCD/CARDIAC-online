@@ -56,38 +56,10 @@ function init_example_sum() {
 function init_example_count() {
 	init_cardiac();
 
-	inputStrip.value.strip[0] = 2;
-	inputStrip.value.strip[1] = 800;
-	inputStrip.value.strip[2] = 10;
-	inputStrip.value.strip[3] = 100;
-	inputStrip.value.strip[4] = 11;
-	inputStrip.value.strip[5] = 605;
-	inputStrip.value.strip[6] = 12;
-	inputStrip.value.strip[7] = 104;
-	inputStrip.value.strip[8] = 13;
-	inputStrip.value.strip[9] = 322;
-	inputStrip.value.strip[10] = 14;
-	inputStrip.value.strip[11] = 505;
-	inputStrip.value.strip[12] = 15;
-	inputStrip.value.strip[13] = 105;
-	inputStrip.value.strip[14] = 16;
-	inputStrip.value.strip[15] = 200;
-	inputStrip.value.strip[16] = 17;
-	inputStrip.value.strip[17] = 605;
-	inputStrip.value.strip[18] = 18;
-	inputStrip.value.strip[19] = 104;
-	inputStrip.value.strip[20] = 19;
-	inputStrip.value.strip[21] = 700;
-	inputStrip.value.strip[22] = 20;
-	inputStrip.value.strip[23] = 604;
-	inputStrip.value.strip[24] = 21;
-	inputStrip.value.strip[25] = 812;
-	inputStrip.value.strip[26] = 22;
-	inputStrip.value.strip[27] = 900;
-	inputStrip.value.strip[28] = 4;
-	inputStrip.value.strip[29] = 9;
-	inputStrip.value.strip[30] = 2;
-	inputStrip.value.strip[31] = 810;
+	inputStrip.value.strip = [
+		2, 800, 10, 100, 11, 605, 12, 104, 13, 322, 14, 505, 15, 105, 16, 200, 17, 605, 18, 104, 19, 700, 20, 604, 21, 812,
+		22, 900, 4, 9, 2, 810, 0,
+	];
 }
 </script>
 
