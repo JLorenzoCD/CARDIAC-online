@@ -4,6 +4,7 @@ import useCARDIAC from './composables/useCARDIAC';
 import MyButton from './components/Button.vue';
 import DataStrip from './components/DataStrip.vue';
 import Memory from './components/Memory.vue';
+import Strip from './components/Strip.vue';
 
 import { formatContentLen } from './utils/format';
 
@@ -64,7 +65,7 @@ function init_example_count() {
 </script>
 
 <template>
-	<div class="container mx-auto pt-3">
+	<div class="container mx-auto py-3">
 		<h1 class="text-3xl font-bold underline mb-8">CARDIAC Online</h1>
 
 		<MyButton class="mr-5" @click="init_cardiac">Resetear</MyButton>
@@ -82,23 +83,11 @@ function init_example_count() {
 			<MyButton @click="execute_slow">Ejecutar paso a paso</MyButton>
 		</div>
 
-		<div class="flex gap-8">
-			<label class="block mb-4">
-				Tira N° 1 -
-				<input type="number" name="tira_1" id="tira_1" min="0" max="1" v-model="instrStrip[0]" />
-			</label>
-			<label class="block mb-4">
-				Tira N° 2 -
-				<input type="number" name="tira_2" id="tira_2" min="0" max="9" v-model="instrStrip[1]" />
-			</label>
-			<label class="block mb-4">
-				Tira N° 3 -
-				<input type="number" name="tira_3" id="tira_3" min="0" max="9" v-model="instrStrip[2]" />
-			</label>
-			<label class="block mb-4">
-				Tira N° 4 -
-				<input type="number" name="tira_4" id="tira_4" min="0" max="9" v-model="instrStrip[3]" />
-			</label>
+		<div class="flex gap-8 h-[390px] mb-8">
+			<Strip :min="0" :max="1" :number-strip="1" v-model:instr="instrStrip[0]" />
+			<Strip :min="0" :max="9" :number-strip="2" v-model:instr="instrStrip[1]" />
+			<Strip :min="0" :max="9" :number-strip="3" v-model:instr="instrStrip[2]" />
+			<Strip :min="0" :max="9" :number-strip="4" v-model:instr="instrStrip[3]" />
 		</div>
 
 		<div class="flex gap-8">
