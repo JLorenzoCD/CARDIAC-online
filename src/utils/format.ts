@@ -6,5 +6,7 @@ export function formatContentLen(content: number, len: number = 3) {
 		content *= -1;
 	}
 
-	return formatContent + content.toString().padStart(len, '0');
+	formatContent += content.toString().padStart(len, '0');
+
+	return formatContent == '000' ? '' : formatContent;
 }
