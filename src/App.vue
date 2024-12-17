@@ -91,10 +91,10 @@ function init_example_count() {
 		</div>
 
 		<div class="flex gap-8">
-			<DataStrip title="Tarjeta de Entrada" :data="inputStrip" />
-			<DataStrip title="Tarjeta de Salida" :data="outputStrip" />
+			<DataStrip title="Tarjeta de Entrada" v-model:data="inputStrip" />
+			<DataStrip title="Tarjeta de Salida" v-model:data="outputStrip" />
 
-			<Memory :pc="pc" :data="mem" />
+			<Memory :pc="pc" v-model:data="mem" />
 		</div>
 	</div>
 </template>

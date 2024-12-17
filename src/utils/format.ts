@@ -1,12 +1,17 @@
 export function formatContentLen(content: number, len: number = 3) {
 	let formatContent = '';
+	let newContent = content;
 
-	if (content < 0) {
+	if (newContent == 0) return formatContent;
+
+	if (newContent < 0) {
 		formatContent = '-';
-		content *= -1;
+		newContent *= -1;
 	}
 
-	formatContent += content.toString().padStart(len, '0');
+	newContent = newContent % 1000;
 
-	return formatContent == '000' ? '' : formatContent;
+	formatContent += newContent.toString().padStart(len, '0');
+
+	return formatContent;
 }

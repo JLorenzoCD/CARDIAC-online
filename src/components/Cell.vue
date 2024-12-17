@@ -1,14 +1,34 @@
 <script setup lang="ts">
-defineProps<{
-	content: string;
+import { formatContentLen } from '../utils/format';
+
+const { content, index, isCurr } = defineProps<{
+	content: number;
 	index: number;
 	isCurr: boolean;
 }>();
+
+const emit = defineEmits(['update:content']);
+
+function updateContent($event: Event) {
+	const value = parseInt(($event.target as HTMLInputElement).value);
+
+	let newValue = isNaN(value) ? 0 : value;
+	newValue = newValue % 1000;
+
+	emit('update:content', newValue);
+}
 </script>
 
 <template>
 	<li class="border border-black h-6 w-[92px] text-center flex justify-between">
 		<span class="bg-gray-200 w-7 border-r border-black text-xs p-1">{{ index.toString().padStart(2, '0') }}</span>
-		<p :class="{ 'w-16': true, 'bg-emerald-200': isCurr }">{{ content }}</p>
+		<input
+			type="number"
+			min="-999"
+			max="999"
+			:class="{ 'w-16': true, 'bg-emerald-200': isCurr }"
+			:value="formatContentLen(content)"
+			@input="updateContent"
+		/>
 	</li>
 </template>
